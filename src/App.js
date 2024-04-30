@@ -13,7 +13,7 @@ function App() {
     <div className="App" style={{ height: "100vh" }}>
       <Row style={{ background: "#2097f3", height: "10%", alignItems: "center" }}>
         <div style={{ width: "100%" }}>
-          <span style={{ float: 'left', marginLeft: 20, color: "white", fontSize: 25 }}>E Learning Portal</span>
+          <span style={{ float: 'left', marginLeft: 20, color: "white", fontSize: 25 }}>E-Learning Portal</span>
           <span style={{ color: "white", marginRight: 20, fontSize: 15, float: 'right' }}>Welcome User1</span>
         </div>
       </Row>
