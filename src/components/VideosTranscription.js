@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { Button, Col, Form, Spin } from 'antd';
+import { Button, Card, Col, Form, Spin } from 'antd';
 import Dragger from 'antd/es/upload/Dragger';
 import {
     InboxOutlined
@@ -31,6 +31,7 @@ function VideosTranscription() {
             setShowSpin(false);
         }
     }
+    const transcriptionDetails = data ? JSON.parse(data?.summary?.message?.function_call?.arguments) : null;
 
     return (
         <Col span={20} style={{ textAlign: 'center' }}>
@@ -56,9 +57,24 @@ function VideosTranscription() {
                         </Form>
                     )
                         : (
-                            <div style={{ margin: "auto", padding: 50, textAlign: 'left', maxWidth: 800 }}>
-                                <h1>Transcription</h1>
-                                <p>{data}</p>
+                            <div style={{ margin: "auto", padding: 50, textAlign: 'left', maxWidth: 1200 }}>
+                                <p style={{ fontSize: 20 }}>Transcription</p>
+                                <p >{data.transcription}</p>
+                                <p style={{ fontSize: 20 }}>Summary</p>
+                                <p>{transcriptionDetails?.transcription_summary}</p>
+
+                                <p style={{ fontSize: 20 }}>Book Recommendations</p>
+
+                                {transcriptionDetails?.book_recommendations?.map((book) => (
+
+                                    <Card bordered={false} style={{ width: 400 }}>
+                                        <h3>{book.book_title}</h3>
+                                        <p >{book.book_summary}</p>
+                                    </Card>
+
+                                ))}
+
+
                             </div>
                         )
                 )
