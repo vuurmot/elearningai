@@ -48,7 +48,49 @@ async function main() {
                 model: "whisper-1",
             });
             console.log(transcription.text);
-            res.send(transcription.text);
+            const completion = await openai.chat.completions.create({
+                messages: [{ role: "system", content: "Pretend you are an expert copywriter" }, {
+                    role: "user", content: `
+                    ${transcription.text}
+                    Create a summary for this transcription, and recommend 3 books regarding the topic.
+                `}],
+                model: "gpt-3.5-turbo",
+                functions: [
+                    {
+                        name: 'ShowTranscriptionDetails',
+                        description: 'This function shows the summary of the transcription as well as recommends 3 books regarding the topic.',
+                        parameters: {
+                            type: 'object',
+                            properties: {
+                                transcription_summary: {
+                                    type: 'string',
+                                    description: 'The summary of the transcription.'
+                                },
+                                book_recommendations: {
+                                    type: 'array',
+                                    items: {
+                                        type: 'object',
+                                        properties: {
+                                            book_title: {
+                                                type: 'string',
+                                                description: 'The title of the book recommended.',
+                                            },
+                                            book_summary: {
+                                                type: 'string',
+                                                description: 'A short summary of the book.',
+                                            },
+                                        },
+                                        // required: ['rolename', 'email', 'action'],
+                                    },
+                                }
+                            },
+                            // required: ['role_users'],
+                        },
+                    }
+                ]
+            });
+            res.send({ transcription: transcription.text, summary: completion.choices[0] });
+
         } catch (e) {
             console.log("error", e);
             res.send(new Error(e));

@@ -1,17 +1,15 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { Button, Card, Col, Form, Spin } from 'antd';
+import { Button, Card, Checkbox, Col, Form, Input, Modal, Row, Spin } from 'antd';
 import Dragger from 'antd/es/upload/Dragger';
 import {
     InboxOutlined
 } from '@ant-design/icons';
 
-
 function VideosTranscription() {
     const [data, setData] = useState(null);
     const [showSpin, setShowSpin] = useState(false);
-    const [form] = Form.useForm();
-
+    const [open, setOpen] = useState(false);
     const retrieveData = async (e) => {
         setShowSpin(true);
         let formData = new FormData();
@@ -23,6 +21,7 @@ function VideosTranscription() {
             };
 
             const response = await axios.post('http://localhost:5000/transcribe', formData, { headers });
+
             setData(response.data);
         } catch (error) {
             console.error(error);
@@ -32,7 +31,12 @@ function VideosTranscription() {
         }
     }
     const transcriptionDetails = data ? JSON.parse(data?.summary?.message?.function_call?.arguments) : null;
-
+    const handleSubmit = () => {
+        setOpen(true);
+    }
+    const handleOnOk = () => {
+        setOpen(false);
+    }
     return (
         <Col span={20} style={{ textAlign: 'center' }}>
             {showSpin ?
@@ -41,7 +45,7 @@ function VideosTranscription() {
                 ) :
                 (
                     !data ? (
-                        <Form style={{ width: "100%" }} form={form} onFinish={retrieveData}>
+                        <Form style={{ width: "100%" }} onFinish={retrieveData}>
                             <Form.Item style={{ marginBottom: 0 }} name="file" getValueFromEvent={({ file }) => file.originFileObj}>
                                 <Dragger maxCount={1} accept='audio/mp3'>
                                     <p className="ant-upload-drag-icon">
@@ -57,29 +61,60 @@ function VideosTranscription() {
                         </Form>
                     )
                         : (
-                            <div style={{ margin: "auto", padding: 50, textAlign: 'left', maxWidth: 1200 }}>
-                                <p style={{ fontSize: 20 }}>Transcription</p>
-                                <p >{data.transcription}</p>
-                                <p style={{ fontSize: 20 }}>Summary</p>
-                                <p>{transcriptionDetails?.transcription_summary}</p>
+                            <Form style={{ margin: "auto", padding: 50, textAlign: 'left', maxWidth: 1200 }}>
 
-                                <p style={{ fontSize: 20 }}>Book Recommendations</p>
+                                <Form.Item>
+                                    <p style={{ fontSize: 20 }}>Transcription</p>
+                                    <Input.TextArea style={{ minHeight: 180 }} defaultValue={data.transcription} allowClear>
+                                    </Input.TextArea>
+                                </Form.Item>
 
-                                {transcriptionDetails?.book_recommendations?.map((book) => (
+                                <Form.Item>
+                                    <p style={{ fontSize: 20 }}>Summary</p>
+                                    <Input.TextArea style={{ minHeight: 180 }} defaultValue={transcriptionDetails?.transcription_summary} allowClear>
 
-                                    <Card bordered={false} style={{ width: 400 }}>
-                                        <h3>{book.book_title}</h3>
-                                        <p >{book.book_summary}</p>
-                                    </Card>
+                                    </Input.TextArea>
 
-                                ))}
+                                </Form.Item>
+                                <Form.Item name="bookRecommendations">
+                                    <p style={{ fontSize: 20 }}>Book Recommendations</p>
+
+                                    <Checkbox.Group>
+                                        <Row>
+                                            {transcriptionDetails?.book_recommendations?.map((book) => (
+                                                <Col key={book.book_title} span={8}>
+                                                    <Card bordered={false} style={{ maxWidth: 350, height: 300 }}>
+                                                        <h3>{book.book_title}</h3>
+                                                        <p >{book.book_summary}</p>
+                                                    </Card>
+                                                    <Checkbox value={book.book_title} style={{ lineHeight: '32px' }}>
+                                                    </Checkbox>
+                                                </Col>
+
+                                            ))}
 
 
-                            </div>
+                                        </Row>
+                                    </Checkbox.Group>
+                                </Form.Item>
+                                <Form.Item>
+                                    <Button onClick={handleSubmit}>Submit</Button>
+                                </Form.Item>
+                            </Form>
+
                         )
                 )
             }
-
+            <Modal
+                title="Submit transcription"
+                open={open}
+                onOk={handleOnOk}
+                onCancel={handleOnOk}
+            // okButtonProps={{ disabled: true }}
+            // cancelButtonProps={{ disabled: true }}
+            >
+                <p>Submit transcription?</p>
+            </Modal>
         </Col>
     );
 }
