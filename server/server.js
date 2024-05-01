@@ -30,13 +30,18 @@ app.use(bodyParser.urlencoded({ extended: true }));
 async function main() {
 
     app.post('/', async (req, res) => {
-        const searchInput = req.body.search;
+        try {
+            const searchInput = req.body.search;
 
-        const completion = await openai.chat.completions.create({
-            messages: [{ role: "system", content: searchInput }],
-            model: "gpt-3.5-turbo",
-        });
-        res.send(completion.choices[0]);
+            const completion = await openai.chat.completions.create({
+                messages: [{ role: "system", content: searchInput }],
+                model: "gpt-3.5-turbo",
+            });
+            res.send(completion.choices[0]);
+        }
+        catch (err) {
+            res.send(new Error(err));
+        }
     })
 
     app.post('/transcribe', upload.single('audFile'), async (req, res) => {
@@ -52,7 +57,7 @@ async function main() {
                 messages: [{ role: "system", content: "Pretend you are an expert copywriter" }, {
                     role: "user", content: `
                     ${transcription.text}
-                    Create a summary for this transcription, and recommend 3 books regarding the topic.
+                    Create a summary for this transcription, and recommend 3 books regarding the topic, as well as the author of the book.
                 `}],
                 model: "gpt-3.5-turbo",
                 functions: [
@@ -64,7 +69,7 @@ async function main() {
                             properties: {
                                 transcription_summary: {
                                     type: 'string',
-                                    description: 'The summary of the transcription.'
+                                    description: 'A basic summary title of the transcription.'
                                 },
                                 book_recommendations: {
                                     type: 'array',
@@ -78,6 +83,10 @@ async function main() {
                                             book_summary: {
                                                 type: 'string',
                                                 description: 'A short summary of the book.',
+                                            },
+                                            book_author: {
+                                                type: 'string',
+                                                description: 'The author of the book.',
                                             },
                                         },
                                         // required: ['rolename', 'email', 'action'],

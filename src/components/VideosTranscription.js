@@ -86,6 +86,7 @@ function VideosTranscription() {
                                                     <Card bordered={false} style={{ maxWidth: 350, height: 300 }}>
                                                         <h3>{book.book_title}</h3>
                                                         <p >{book.book_summary}</p>
+                                                        <span>By: {book.book_author}</span>
                                                     </Card>
                                                     <Checkbox value={book.book_title} style={{ lineHeight: '32px' }}>
                                                     </Checkbox>
