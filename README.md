@@ -1,5 +1,8 @@
 # Summary
 A demo app for integrating OpenAI's API (Whisper API Transcription) (GPT for generative text)
+Based on a hypothetical scenario where a lecturer is producing E-learning videos via the E-learning portal
+Ask general questions i.e. ChatGPT
+Transcribe audio files, and get a text summary as well as book recommendations according to audio file
 
 # Demo
 ![alt text](https://github.com/vuurmot/elearningai/blob/main/demo/1.PNG)
